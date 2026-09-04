@@ -4,7 +4,7 @@ SOURCES ?= $(shell find $(SRC_DIR) -name '*.c' -or -name '*.S')
 OBJECTS ?= $(addsuffix .o, $(basename $(notdir $(SOURCES))))
 LINKER ?= $(SRC_DIR)/dtekv-script.lds
 
-TOOLCHAIN ?= riscv64-unknown-elf-
+TOOLCHAIN ?= riscv32-unknown-elf-
 CFLAGS ?= -Wall -nostdlib -O3 -mabi=ilp32 -march=rv32imzicsr -fno-builtin
 
 

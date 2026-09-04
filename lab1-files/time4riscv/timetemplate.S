@@ -140,7 +140,7 @@ delay:
 	addi 	a0, a0, -1	# Ticks down 1 ms
 
 	li 	t0, 0		# same as int i in C program, inizlized as 0
-	li 	t1, 4711 	# The comparizion number, change it here :)
+	li 	t1, 5000000 	# The comparizion number, change it here :)
 LDel:
 	bge 	t0, t1, delay	# If it is lager than 4711, it will exit the loop and go back to the while loop
 	addi	t0, t0, 1	
