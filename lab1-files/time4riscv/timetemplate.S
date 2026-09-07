@@ -121,91 +121,76 @@ tiend:	sw	t0,0(a0)	# save updated result
 
 
 hexasc:
-	slli 	a0, a0, 28
-	srli 	a0, a0, 28
+	andi 	a0, a0, 0xF 	# Keps value of LSN (last 4 bits) and sets rest to 0s  
 	
-	li 	t0, 9
-	ble 	a0, t0, notChar
+	li 	t0, 9		# int to compare to
+	bgt 	a0, t0, letter	# if a0 bigger than 9, it will be a char (a-f), so jump to char
 	
-	addi	a0, a0, 7
-notChar:
-	addi	a0, a0, 48
+	addi	a0, a0, 0x30	# a0 <= 9 is number, add 48 to get to numbers ascii value
 	
-	jr	ra
+	ret			# Same as jr ra, returns
+letter:
+	addi	a0, a0, 0x37	# a0 > 9, it is a letter, starts 55 so we add it (65 == a)
+	
+	ret
 	
 	
 delay:
+
 	blez 	a0, exitDelay	# Exits if delay is 0 or less
-	
+
 	addi 	a0, a0, -1	# Ticks down 1 ms
 
 	li 	t0, 0		# same as int i in C program, inizlized as 0
-	li 	t1, 5000000 	# The comparizion number, change it here :)
+	li 	t1, 4711 	# The comparizion number, change it here :)
 LDel:
 	bge 	t0, t1, delay	# If it is lager than 4711, it will exit the loop and go back to the while loop
 	addi	t0, t0, 1	
 	j 	LDel		# Loops back
-	
-	
+
+	# Entire loop is 3 clock cycles :) 3x4711x2 = 28266 cycles per second
+
 exitDelay:
 	jr 	ra
 	
 
 
-time2string: 
-	PUSH s0
-	PUSH s1
-	PUSH ra
+time2string:
 
+    PUSH ra		# ra- and s-registers are callee's responsibility, so we save current value to stack
+    PUSH s0
+    PUSH s1
 
-	li 	s0, 16 		# Left shift amount
-	li 	s1, 0  		# Loop Counter
-	 
-loopEx: 
-	li 	t0, 2
-	beq 	s1, t0, addColon
-	
-	li 	t0, 5
-	beq 	s1, t0, exitLoopEx
+    li t0, 0xFFFF	# Removes 16 bit that are just noice (we only care about first 2 bytes)
+    and a1, a1, t0 
 
-	PUSH a0	
-	PUSH a1
-	sll 	a0, a1, s0	# Gets only the appropriate bits in a1 	
-	srli	a0, a0, 28 	# Moves them to LSB and 0s the rest
-	
-	jal	hexasc		# Convert to HEX
-	add 	t1, a0, zero	# Save return value
-	POP a1
-	POP a0
-	
-	sb 	t1, 0(a0)	# Store HEX
-	
-	# Increments all necesary values
-	addi 	a0, a0, 1 
-	addi 	s0, s0, 4
-	addi 	s1, s1, 1
-	
-	j 	loopEx
-	
-# Adds a colon on pos 3
-addColon:
-	li 	t1, 0x3A
-	sb 	t1, 0(a0)
-	
-	addi 	a0, a0, 1 
-	addi 	s1, s1, 1
-	
-	j 	loopEx 
-	
-# Adds a \0 on pos 5 and exits program
-exitLoopEx:
-	li 	t1, 0x00
-	sb 	t1, 0(a0)
-	
-	POP ra
-	POP s1
-	POP s2
-	
-	jr 	ra
-	
- 
+    mv s0, a0		# Move to s-regs to avoid resposibility of a-regs
+    mv s1, a1
+
+    srli a0, s1, 12	# Shift 12 bits to the right (logical) to save the MSN as LSN
+    jal hexasc 		# in a0 as a argument to hexasc.
+    sb a0, 0(s0)	# Stores byte in allocated space, with appropriate offset
+
+    srli a0, s1, 8	# Shift 8 bits to the right (logical) to save the 2nd MSN as LSN
+    jal hexasc		# in a0 as a argument to hexasc
+    sb a0, 1(s0)	# Stores byte in allocated space, with appropriate offset
+
+    li a0, 0x3a		# 0x3a is the hex value for the ascii char ":"
+    sb a0, 2(s0)	# Stores byte in allocated space, with appropriate offset
+
+    srli a0, s1, 4	# Shift 4 bits to the right (logical) to save the 3rd MSN as LSN
+    jal hexasc		# in a0 as a argument to hexasc
+    sb a0, 3(s0)	# Stores byte in allocated space, with appropriate offset
+
+    add a0, s1, zero	# Add timestr to a0
+    jal hexasc 		# in a0 as a argument to hexasc
+    sb a0, 4(s0)	# Stores byte in allocated space, with appropriate offset
+
+    li a0, 0x00		# 0x00 is the hex value for the ascii char nullspace (\00)
+    sb a0, 5(s0)	# Stores byte in allocated space, with appropriate offset
+
+    POP s1		# Pops all stack saved values to be used by caller
+    POP s0
+    POP ra
+
+    ret			# Returns :)
