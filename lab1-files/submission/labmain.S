@@ -21,7 +21,7 @@ main:
     # jal hex2asc
 	
     #U Uncomment below for assignment 3 & 6
-    jal timetemplate
+    # jal timetemplate
 
 loop: j loop
 

@@ -16,27 +16,27 @@
 ###################
 # Macros for RARS #
 ###################
-.macro	PUSH (%reg)
-	addi	sp,sp,-4
-	sw	%reg,0(sp)
-.end_macro
-
-.macro	POP (%reg)
-	lw	%reg,0(sp)
-	addi	sp,sp,4
-.end_macro
+#.macro	PUSH (%reg)
+#	addi	sp,sp,-4
+#	sw	%reg,0(sp)
+#.end_macro
+#
+#.macro	POP (%reg)
+#	lw	%reg,0(sp)
+#	addi	sp,sp,4
+#.end_macro
 ###################
 # Macros for DTEK #
 ###################
-#.macro	PUSH reg
-#	addi sp,sp,-4
-#	sw \reg,0(sp)
-#.endm
-#
-#.macro	POP reg
-#	lw	\reg,0(sp)
-#	addi	sp,sp,4
-#.endm
+.macro	PUSH reg
+	addi sp,sp,-4
+	sw \reg,0(sp)
+.endm
+
+.macro	POP reg
+	lw	\reg,0(sp)
+	addi	sp,sp,4
+.endm
 #############################################################
 
 	.data
@@ -157,9 +157,9 @@ exitDelay:
 
 time2string:
 
-    PUSH(ra)		# ra- and s-registers are callee's responsibility, so we save current value to stack
-    PUSH(s0)
-    PUSH(s1)
+    PUSH ra		# ra- and s-registers are callee's responsibility, so we save current value to stack
+    PUSH s0
+    PUSH s1
 
     li t0, 0xFFFF	# Removes 16 bit that are just noice (we only care about first 2 bytes)
     and a1, a1, t0 
@@ -189,8 +189,8 @@ time2string:
     li a0, 0x00		# 0x00 is the hex value for the ascii char nullspace (\00)
     sb a0, 5(s0)	# Stores byte in allocated space, with appropriate offset
 
-    POP(s1)		# Pops all stack saved values to be used by caller
-    POP(s0)
-    POP(ra)
+    POP s1		# Pops all stack saved values to be used by caller
+    POP s0
+    POP ra
 
     ret			# Returns :)
