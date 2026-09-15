@@ -1,6 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <time.h>
+
+/*
+    this assignment was authored by Anton Lennström
+*/
 
 #define COLUMNS 6
 int counter = 0;
@@ -21,28 +26,23 @@ void print_sieves(int n){
     // the number of columns is stated in the define
     // COLUMNS
 
-    int *integers = malloc(sizeof(int) * (n - 1));
+    char *arr = malloc(sizeof(char) * (n-1)); 
 
-    if (integers == NULL)
-        return;
-
-    unsigned int index = 0;
-    for (int i = 2; i <= n; i++) {
-        integers[index] = i;
-        index++;
+    for (int i = 0; i < n - 1; i++) {
+        arr[i] = 'U';
     }
 
     int p = 2;
     while (true) {
         int multiple = 2;
         while ((p * multiple) <= n) {
-            integers[(p * multiple) - 2] = 0;
+            arr[(p * multiple) - 2] = 'C';
             multiple++;
         }
 
         int current_p = p;
         for (int i = (p + 1); i < (n - 1); i++) {
-            if(!integers[i - 2]) 
+            if(arr[i - 2] == 'C') 
                 continue;
             p = i;
             break;
@@ -54,14 +54,14 @@ void print_sieves(int n){
     }
 
     for (int i = 0; i < (n - 1); i++) {
-        int value = integers[i];
-        if (!value)
+        int value = arr[i];
+        if (value == 'C')
             continue;
 
-        print_number(value);
+        print_number(i + 2);
     }
 
-    free(integers);
+    free(arr);
 }
 
 // 'argc' contains the number of program arguments, and
@@ -70,7 +70,15 @@ void print_sieves(int n){
 int main(int argc, char *argv[]){
     if(argc == 2)
     {
+        time_t start_time, end_time;
+        start_time = time(NULL); 
+
         print_sieves(atoi(argv[1]));
+
+        end_time = time(NULL); 
+        double elapsed = difftime(end_time, start_time);
+        
+        printf("Elapsed time: %.0000f seconds.\n", elapsed);
     }
   else
     printf("Please state an integer number.\n");

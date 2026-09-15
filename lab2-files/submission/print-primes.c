@@ -9,6 +9,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/*
+  This assignment was authored by Anton Lennström
+*/
+
 #define COLUMNS 6
 int counter = 0;
 
@@ -25,7 +29,7 @@ int is_prime(int n){
 }
 
 void print_number(int n) {
-    if (counter >= COLUMNS) {
+    if (counter == COLUMNS) {
       printf("\n");
       counter = 0;
     }

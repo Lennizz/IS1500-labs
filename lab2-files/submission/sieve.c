@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+/*
+    this code was authored by Anton Lennström
+*/
+
 #define COLUMNS 6
 int counter = 0;
 
