@@ -17,6 +17,10 @@
 int counter = 0;
 
 int is_prime(int n){
+
+  if(n <= 1)
+    return 0;
+  
   int r = 2;
 
   while (r*r <= n) {
