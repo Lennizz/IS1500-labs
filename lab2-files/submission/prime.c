@@ -12,6 +12,8 @@ int is_prime(int n){
   /*
     This code was written by Axel Åhman 
   */
+  if(n < 2)
+    return 0;
  
   for(int i=2; i<n; i++){
     if(n % i == 0)
