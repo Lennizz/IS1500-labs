@@ -70,15 +70,15 @@ void print_sieves(int n){
 int main(int argc, char *argv[]){
     if(argc == 2)
     {
-        time_t start_time, end_time;
-        start_time = time(NULL); 
+        //time_t start_time, end_time;
+        //start_time = time(NULL); 
 
         print_sieves(atoi(argv[1]));
 
-        end_time = time(NULL); 
-        double elapsed = difftime(end_time, start_time);
+        //end_time = time(NULL); 
+        //double elapsed = difftime(end_time, start_time);
         
-        printf("Elapsed time: %.0000f seconds.\n", elapsed);
+        //printf("Elapsed time: %.0000f seconds.\n", elapsed);
     }
   else
     printf("Please state an integer number.\n");
