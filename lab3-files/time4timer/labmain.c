@@ -17,6 +17,8 @@ extern int nextprime( int );
 int mytime = 0x005959;
 char textstring[] = "text, more text, and even more text!";
 
+volatile int *timeout_pointer = (volatile int*)0x04000020;
+
 
 int clamp(int value, int min, int max) {
   if (value < min) return min;
@@ -84,30 +86,58 @@ void set_displays(int display_number, int value, int dot){
   return (*switch_values & 0x3FF);
  }
 
- int get_btn(void) {
+ int get_btn(void){
   volatile int* button_value = (volatile int*) 0x040000d0;  
   return (*button_value & 0x1); 
  }
 
 
 /* Below is the function that will be called when an interrupt is triggered. */
-void handle_interrupt(unsigned cause) 
-{}
+void handle_interrupt(unsigned cause){
+
+}
 
 /* Add your code here for initializing interrupts. */
-void labinit(void)
-{}
+void labinit(void){
+
+  volatile int* control_pointer = (volatile int *)0x04000024;
+
+  volatile int* periodh_pointer = (volatile int *)0x0400002c;
+
+  volatile int* periodl_pointer = (volatile int *)0x04000028;
+
+  *periodh_pointer = 0b0000000000101101;
+
+  *periodl_pointer = 0b1100011011000000;
+
+  *control_pointer = 0b110;
+}
+
+int check_timeout(){
+  
+  int status = *timeout_pointer;
+
+  status &= 0b1;
+
+  if(status)
+    *timeout_pointer &= 0xFFFFFFFE;
+
+  return status;
+
+}
 
 /* Your code goes into main as well as any needed functions. */
 int main() {
   // Call labinit()
   labinit();
 
+
   int counter = 0;
   while (counter <= 15) { 
-    set_leds(counter);
-    delay(2);
-    counter++;
+    if(check_timeout()){
+      set_leds(counter);
+      counter++;
+    }
   }
 
   // Enter a forever loop
@@ -145,6 +175,9 @@ int main() {
         mytime = 0x0;
     }
     
+    
+    if(check_timeout()){
+
     set_displays(0, (mytime & 0x00000F), 0);
     set_displays(1, (mytime & 0x0000F0) >> 4, 0);
     set_displays(2, (mytime & 0x000F00) >> 8, 1);
@@ -161,13 +194,10 @@ int main() {
       mytime &= 0x0FFFFF;
   
     set_displays(5, (mytime & 0xF00000) >> 20, 0);
+      time2string( textstring, mytime ); // Converts mytime to string
+      display_string( textstring ); //Print out the string 'textstring'
+      tick( &mytime );     // Ticks the clock once
+    }
 
-
-    time2string( textstring, mytime ); // Converts mytime to string
-    display_string( textstring ); //Print out the string 'textstring'
-    delay( 2 );          // Delays 1 sec (adjust this value)
-    tick( &mytime );     // Ticks the clock once
   }
 }
-
-
